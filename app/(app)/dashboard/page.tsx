@@ -80,6 +80,12 @@ async function getVideos(): Promise<VideoType[]> {
   try {
     const { createClient } = await import('@/lib/supabase/server')
     const supabase = await createClient()
+
+    // If Supabase client is null (not configured), use mock data
+    if (!supabase) {
+      return MOCK_VIDEOS
+    }
+
     const { data } = await supabase
       .from('videos')
       .select('*')

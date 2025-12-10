@@ -1,3 +1,16 @@
+// TODO: Re-enable when Stripe is configured
+// Commented out to allow build without STRIPE_SECRET_KEY
+
+import { NextResponse } from 'next/server'
+
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Stripe is not configured yet' },
+    { status: 503 }
+  )
+}
+
+/*
 import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 import { NextResponse } from 'next/server'
@@ -38,3 +51,4 @@ export async function POST() {
     )
   }
 }
+*/

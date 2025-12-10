@@ -1,10 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Play, Heart, Eye, Share2, Bookmark, RefreshCw, ExternalLink, Download } from 'lucide-react'
+import { ArrowLeft, Play, Heart, Eye, Share2, Bookmark, RefreshCw, ExternalLink, Download, ChevronLeft, ChevronRight, Images } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { formatNumber, formatDate } from '@/lib/utils'
+import { SlideshowPlayer } from './slideshow-player'
 
 interface VideoDetailPageProps {
   params: Promise<{ id: string }>
@@ -13,6 +15,11 @@ interface VideoDetailPageProps {
 export default async function VideoDetailPage({ params }: VideoDetailPageProps) {
   const { id } = await params
   const supabase = await createClient()
+
+  // If Supabase not configured, show not found
+  if (!supabase) {
+    notFound()
+  }
 
   const { data: video } = await supabase
     .from('videos')
@@ -43,9 +50,27 @@ export default async function VideoDetailPage({ params }: VideoDetailPageProps) 
       </div>
 
       <div className="max-w-lg mx-auto px-4 pt-4 space-y-4">
-        {/* Video preview */}
+        {/* Video type badge */}
+        {video.video_type && (
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="capitalize">
+              <Images className="h-3 w-3 mr-1" />
+              {video.video_type}
+            </Badge>
+            {video.slideshow_type && (
+              <Badge variant="outline" className="capitalize">
+                {video.slideshow_type.replace('_', '/')}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Video/Slideshow preview */}
         <div className="aspect-[9/16] bg-black rounded-xl overflow-hidden relative">
-          {video.video_url ? (
+          {/* Slideshow display */}
+          {video.video_type === 'slideshow' && video.slides && video.slides.length > 0 ? (
+            <SlideshowPlayer slides={video.slides} />
+          ) : video.video_url ? (
             <video
               src={video.video_url}
               poster={video.thumbnail_url || undefined}
@@ -61,6 +86,7 @@ export default async function VideoDetailPage({ params }: VideoDetailPageProps) 
                 {video.status === 'pending' && 'Waiting to process...'}
                 {video.status === 'processing' && 'Processing video...'}
                 {video.status === 'failed' && 'Video generation failed'}
+                {video.status === 'completed' && !video.video_url && !video.slides && 'No preview available'}
               </p>
             </div>
           )}
@@ -120,13 +146,63 @@ export default async function VideoDetailPage({ params }: VideoDetailPageProps) 
           )}
         </div>
 
+        {/* Hook info (for slideshows) */}
+        {video.hook && (
+          <Card>
+            <CardContent className="p-4 space-y-2">
+              <p className="text-xs text-muted-foreground mb-1">Selected Hook</p>
+              <p className="text-sm font-medium">&ldquo;{video.hook.hook}&rdquo;</p>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="capitalize text-xs">
+                  {video.hook.style?.replace('_', ' ')}
+                </Badge>
+              </div>
+              {video.hook.whyItWorks && (
+                <p className="text-xs text-muted-foreground mt-2">{video.hook.whyItWorks}</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Hashtags (for slideshows) */}
+        {video.hashtags && video.hashtags.length > 0 && (
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-xs text-muted-foreground mb-2">Hashtags</p>
+              <div className="flex flex-wrap gap-1.5">
+                {video.hashtags.map((tag: string, i: number) => (
+                  <Badge key={i} variant="outline" className="text-xs">
+                    #{tag.replace('#', '')}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Details */}
         <Card>
           <CardContent className="p-4 space-y-3">
-            <div>
-              <p className="text-xs text-muted-foreground mb-1">Prompt</p>
-              <p className="text-sm">{video.prompt}</p>
-            </div>
+            {video.prompt && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Prompt</p>
+                <p className="text-sm">{video.prompt}</p>
+              </div>
+            )}
+
+            {video.product_description && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Product Description</p>
+                <p className="text-sm">{video.product_description}</p>
+              </div>
+            )}
+
+            {video.target_audience && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Target Audience</p>
+                <p className="text-sm">{video.target_audience}</p>
+              </div>
+            )}
 
             {video.product_name && (
               <div>
@@ -181,7 +257,7 @@ export default async function VideoDetailPage({ params }: VideoDetailPageProps) 
             <CardContent className="p-4">
               <p className="text-xs text-muted-foreground mb-3">Product Images</p>
               <div className="grid grid-cols-3 gap-2">
-                {productImages.map((image) => (
+                {productImages.map((image: { id: string; image_url: string }) => (
                   <div key={image.id} className="aspect-square rounded-lg overflow-hidden bg-muted">
                     <img
                       src={image.image_url}

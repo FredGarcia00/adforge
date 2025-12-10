@@ -157,6 +157,15 @@ export default function VideosPage() {
       try {
         const { createClient } = await import('@/lib/supabase/client')
         const supabase = createClient()
+
+        // Handle null client (Supabase not configured)
+        if (!supabase) {
+          setVideos(MOCK_VIDEOS)
+          setUsingMockData(true)
+          setIsLoading(false)
+          return
+        }
+
         const { data, error } = await supabase
           .from('videos')
           .select('*')
@@ -190,6 +199,9 @@ export default function VideosPage() {
 
     const { createClient } = await import('@/lib/supabase/client')
     const supabase = createClient()
+
+    if (!supabase) return
+
     const { error } = await supabase.from('videos').delete().eq('id', id)
 
     if (!error) {
@@ -217,6 +229,12 @@ export default function VideosPage() {
 
     const { createClient } = await import('@/lib/supabase/client')
     const supabase = createClient()
+
+    if (!supabase) {
+      setIsDeleting(false)
+      return
+    }
+
     const ids = Array.from(selectedIds)
 
     const { error } = await supabase.from('videos').delete().in('id', ids)

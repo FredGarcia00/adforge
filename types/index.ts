@@ -18,6 +18,46 @@ export interface FilterState {
 
 export type BulkAction = 'delete' | 'export'
 
+// Hook generation types
+export type HookStyle = 'curiosity' | 'bold_claim' | 'question' | 'controversial' | 'story' | 'fomo' | 'results'
+
+export interface GeneratedHook {
+  hook: string
+  style: HookStyle
+  whyItWorks: string
+}
+
+// Slideshow types
+export type SlideshowType = 'listicle' | 'story' | 'before_after' | 'tutorial'
+export type ImageStyle = 'realistic' | 'aesthetic' | 'minimal' | 'vibrant'
+
+export interface Slide {
+  slideNumber: number
+  text: string
+  imagePrompt: string
+  imageUrl?: string
+  duration: number
+}
+
+export interface Slideshow {
+  title: string
+  slides: Slide[]
+  totalDuration: number
+  hashtags: string[]
+}
+
+// Video generation types
+export type VideoType = 'slideshow' | 'ugc' | 'meme'
+
+export interface GenerationJob {
+  id: string
+  type: VideoType
+  status: VideoStatus
+  hook: GeneratedHook
+  slideshow?: Slideshow
+  createdAt: string
+}
+
 export interface User {
   id: string
   email: string
@@ -30,7 +70,7 @@ export interface User {
 
 export interface Video {
   id: string
-  user_id: string
+  user_id: string | null
   title: string
   prompt: string
   video_url: string | null
@@ -46,6 +86,17 @@ export interface Video {
   product_benefits: string[] | null
   brand_colors: string[] | null
   created_at: string
+  updated_at?: string
+  // Slideshow-specific fields
+  video_type?: VideoType
+  slides?: Slide[]
+  hook?: GeneratedHook
+  image_style?: ImageStyle
+  slideshow_type?: SlideshowType
+  hashtags?: string[]
+  total_duration?: number
+  product_description?: string | null
+  target_audience?: string | null
 }
 
 export interface TikTokAccount {
