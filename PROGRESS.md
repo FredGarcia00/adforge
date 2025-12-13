@@ -1,8 +1,8 @@
 # AdForge - Development Progress
 
-## Current Status: Phase 1.75 - UI Fixes & Image Persistence
+## Current Status: Phase 2 - Vercel Deployment Ready
 
-Last Updated: December 8, 2024
+Last Updated: December 10, 2024
 
 ---
 
@@ -482,9 +482,58 @@ types/
 
 ---
 
-## Session Summary - December 8, 2024
+## Session Summary - December 10, 2024
 
 ### What Was Done Today
+
+1. **Vercel Deployment Prep**
+   - Fixed build errors for production deployment
+   - Commented out Stripe routes (awaiting Stripe configuration)
+   - Simplified Supabase client (removed unnecessary null-check logic)
+   - Updated Next.js from 15.0.3 to 16.0.8 (fixed security vulnerabilities)
+
+2. **Stripe Routes Temporarily Disabled**
+   - `app/api/stripe/checkout/route.ts` - Returns 503 placeholder
+   - `app/api/stripe/portal/route.ts` - Returns 503 placeholder
+   - `app/api/stripe/webhook/route.ts` - Returns 503 placeholder
+   - Original code preserved in comments for easy re-enabling
+
+3. **Environment Variables for Vercel**
+   Required env vars to add in Vercel Dashboard:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `ANTHROPIC_API_KEY`
+   - `REPLICATE_API_TOKEN`
+   - `NEXT_PUBLIC_APP_URL` (set to your Vercel URL)
+
+### Files Changed
+
+| File | Change |
+|------|--------|
+| `app/api/stripe/checkout/route.ts` | Commented out Stripe SDK usage |
+| `app/api/stripe/portal/route.ts` | Commented out Stripe SDK usage |
+| `app/api/stripe/webhook/route.ts` | Commented out Stripe SDK usage |
+| `lib/supabase/client.ts` | Simplified - removed null checks |
+| `lib/supabase/server.ts` | Simplified - removed null checks |
+| `package.json` | Updated Next.js to 16.0.8 |
+
+### Deployment Instructions
+
+1. Add environment variables in Vercel Dashboard
+2. Run these commands to push changes:
+   ```bash
+   git add -A
+   git commit -m "Fix build for Vercel deployment"
+   git push origin main
+   ```
+3. Vercel will auto-deploy on push
+
+---
+
+## Session Summary - December 8, 2024
+
+### What Was Done
 
 1. **Fixed Content/Videos Page Crash**
    - Added null checks for Supabase client in `app/(app)/content/videos/page.tsx`
