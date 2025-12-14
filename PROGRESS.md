@@ -1,8 +1,8 @@
 # AdForge - Development Progress
 
-## Current Status: Phase 2 - Vercel Deployment Ready
+## Current Status: Phase 2 - TikTok Integration In Progress
 
-Last Updated: December 10, 2024
+Last Updated: December 13, 2024
 
 ---
 
@@ -296,11 +296,13 @@ Transformed from TikTok-style vertical video feed to professional YouTube Studio
 - [x] Broken image handling with graceful fallback
 - [x] Next.js image domain configuration
 
-### Phase 2: UGC & Automation - UP NEXT
+### Phase 2: UGC & Automation - IN PROGRESS
 
 - [ ] Hook + Demo UGC videos (HeyGen integration)
 - [ ] Batch generation ("Generate 10 Videos" button)
 - [ ] Auto-scheduling queue
+- [x] TikTok Developer account created
+- [ ] TikTok App registration (in progress)
 - [ ] TikTok OAuth connection
 - [ ] Direct TikTok posting
 
@@ -340,6 +342,10 @@ REPLICATE_API_TOKEN=r8_xxx
 # Heygen (for Phase 2)
 HEYGEN_API_KEY=your_heygen_api_key
 
+# TikTok (for Phase 2)
+TIKTOK_CLIENT_KEY=your_tiktok_client_key
+TIKTOK_CLIENT_SECRET=your_tiktok_client_secret
+
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
@@ -351,6 +357,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 | Anthropic | https://console.anthropic.com/ | Hook & script generation |
 | Replicate | https://replicate.com/account/api-tokens | Image generation |
 | HeyGen | https://app.heygen.com/ | UGC avatar videos (Phase 2) |
+| TikTok | https://developers.tiktok.com/ | OAuth & video posting (Phase 2) |
 
 ### Running the App
 
@@ -411,12 +418,19 @@ npm run dev
 app/
 ├── (app)/
 │   ├── generate/
-│   │   └── page.tsx              # UPDATED - 4-step flow with save
+│   │   └── page.tsx              # 4-step flow with save
 │   ├── content/
 │   │   └── videos/
 │   │       └── page.tsx          # Video table
-│   └── dashboard/
-│       └── page.tsx              # Overview
+│   ├── dashboard/
+│   │   └── page.tsx              # Overview
+│   └── profile/
+│       └── tiktok/
+│           └── page.tsx          # TikTok accounts management
+├── terms/
+│   └── page.tsx                  # NEW - Terms of Service (for TikTok)
+├── privacy/
+│   └── page.tsx                  # NEW - Privacy Policy (for TikTok)
 ├── api/
 │   ├── hooks/
 │   │   └── generate/
@@ -427,9 +441,17 @@ app/
 │   │   ├── image/
 │   │   │   └── route.ts          # Image generation
 │   │   └── save/
-│   │       └── route.ts          # NEW - Save/fetch slideshows
+│   │       └── route.ts          # Save/fetch slideshows
+│   ├── auth/
+│   │   └── tiktok/
+│   │       ├── route.ts          # PLANNED - TikTok OAuth initiate
+│   │       └── callback/
+│   │           └── route.ts      # PLANNED - TikTok OAuth callback
+│   ├── tiktok/
+│   │   └── post/
+│   │       └── route.ts          # PLANNED - Post video to TikTok
 │   ├── generate/
-│   │   └── route.ts              # Existing HeyGen integration
+│   │   └── route.ts              # HeyGen integration
 │   └── videos/
 │       └── bulk/
 │           └── route.ts          # Bulk actions
@@ -479,6 +501,48 @@ types/
 - [ ] Generate page (needs API keys to test)
 - [ ] Video detail
 - [ ] Analytics
+
+---
+
+## Session Summary - December 13, 2024
+
+### What Was Done Today
+
+1. **TikTok Integration Started**
+   - Created TikTok Developer account
+   - Beginning TikTok App registration process
+   - Preparing for OAuth flow implementation
+
+2. **Legal Pages Added**
+   - Created Terms of Service page (`app/terms/page.tsx`)
+   - Created Privacy Policy page (`app/privacy/page.tsx`)
+   - Required for TikTok App registration
+
+### Files Created
+
+| File | Purpose |
+|------|---------|
+| `app/terms/page.tsx` | Terms of Service page for TikTok compliance |
+| `app/privacy/page.tsx` | Privacy Policy page for TikTok compliance |
+
+### TikTok Integration Progress
+
+| Step | Status |
+|------|--------|
+| Developer account | Complete |
+| Terms of Service URL | Complete |
+| Privacy Policy URL | Complete |
+| App registration | In progress |
+| OAuth flow implementation | Not started |
+| Video posting API | Not started |
+
+### Next Steps for TikTok
+
+1. Complete TikTok App registration
+2. Get Client Key and Client Secret
+3. Build OAuth flow (`/api/auth/tiktok/`)
+4. Build video posting endpoint (`/api/tiktok/post/`)
+5. Update TikTok accounts UI page
 
 ---
 
@@ -611,21 +675,25 @@ WITH CHECK (bucket_id = 'slideshow-images');
 
 ## Next Steps
 
-1. **Run Storage Bucket Migration**
-   - Execute `migration_create_storage_bucket.sql` in Supabase
-   - This enables permanent image storage
+1. **Complete TikTok App Registration**
+   - Finish app setup in TikTok Developer Portal
+   - Request Content Posting API access
+   - Get Client Key and Client Secret
 
-2. **Test End-to-End Flow**
-   - Generate a new slideshow
-   - Save it
-   - View it on video detail page
-   - Verify images persist after browser refresh
+2. **Build TikTok OAuth Flow**
+   - Create `/api/auth/tiktok/route.ts` - Initiate OAuth
+   - Create `/api/auth/tiktok/callback/route.ts` - Handle callback
+   - Store tokens in `tiktok_accounts` table
 
-3. **Begin Phase 2**
-   - HeyGen UGC video integration
-   - Batch generation ("Generate 10 Videos" button)
-   - Video export with FFmpeg
+3. **Build TikTok Posting API**
+   - Create `/api/tiktok/post/route.ts` - Post video to TikTok
+   - Create `/lib/tiktok.ts` - TikTok API client utilities
+
+4. **Update TikTok UI**
+   - Enable "Connect" button on `/profile/tiktok` page
+   - Show connected account status
+   - Add disconnect functionality
 
 ---
 
-*Last updated: December 8, 2024*
+*Last updated: December 13, 2024*
